@@ -1,0 +1,33 @@
+name: Cloud Foundry Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Activate Deployment'
+        default: 'Deployed'
+        required: true
+#   push:
+#     branches:
+#     - main
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-18.04
+    # needs: build
+
+    steps:
+
+    - uses: Daze-Locked/Daze-CFdry-CLI@main
+      with:
+        cf_api: https://api.cf.ap21.hana.ondemand.com
+        cf_username: ${{ secrets.CF_USERNAME }}
+        cf_password: ${{ secrets.CF_PASSWORD }}
+        cf_org: ef77244etrial
+        cf_space: dev
+        docker_passwrd: ${{ secrets.CF_DOCKER_PASSWRD }}
+        command: push cloudfoundryapp --docker-image croziernn/cloudfoundryapp:latest --docker-username croziernn -t 60
+        
+    - name: Deploy To Cloud Foundry
+      run: echo "Application ${{ github.event.inputs.name }}"

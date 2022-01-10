@@ -1,0 +1,27 @@
+name: Docker Push (V1)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to DockerHub
+      run: docker login -u croziernn -p ${{ secrets.CF_DOCKER_PASSWRD }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag croziernn/daze-cldry-cli:v1
+    # - name: Get Version
+    #   id: get_version
+    #   run: |
+    #     VERSION=$(docker run --entrypoint "/bin/bash" ellpope/cloudfoundry-cli-action:v7 -c cf --version | sed -nr 's/^cf version ([0-9]\.[0-9]+\.[0-9]+).*/\1/p' | xargs)
+    #     echo "CF CLI Version is ${VERSION}"
+    #     echo "::set-output name=version::$(echo ${VERSION})"
+    - name: Tag Docker Image
+      run: docker tag croziernn/daze-cldry-cli:v1 croziernn/daze-cldry-cli:v1 # ${{ steps.get_version.outputs.version }}
+    - name: Push Docker Image
+      run: docker push -a croziernn/daze-cldry-cli
